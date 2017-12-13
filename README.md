@@ -1,2 +1,2 @@
 # ADT-Headers
-Abstract Data Type implementation in C
+Abstract Data Type implementations in C
