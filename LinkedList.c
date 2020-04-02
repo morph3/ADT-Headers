@@ -1,126 +1,253 @@
-#include "LinkedList.h"
+#include "linked_list.h"
+
+void insert_val(list l, int pos, int val){
+    if (DEBUG){
+            printf("Insertion started\n");
+
+    }
+    node tmpnode = (struct node *)malloc(sizeof(struct node));
+    tmpnode->next = NULL;
+    tmpnode->val = val;
 
 
-List CreateList(void){
-    List list;
-    list = (struct ListRecord *) malloc(sizeof(struct ListRecord));
-    if (list == NULL) {
+    //if its in the last place 
+    if (pos > l->size){
+        l->tail->next = tmpnode;
+        l->tail = tmpnode;
+        l->size++;
+        return;
+    }
+
+
+    node traverser = l->head;
+    while(pos != 0){
+        traverser = traverser->next;
+        if (DEBUG){
+            printf("Traverser next points to : 0x%x\n", traverser->next);
+
+        }
+        pos--;
+    }
+
+    tmpnode->next = traverser->next;
+    traverser->next = tmpnode;
+    if(DEBUG){
+        printf("Traverser next points to : 0x%x\n", traverser->next);
+        printf("Temporary node points to : 0x%x\n\n", traverser->next);
+        printf("Insertion completed\n");
+
+    }
+    l->size++;
+
+}
+
+void print_list(struct ListRecord *l){
+    struct node *tmp_node = l->head->next;
+    while(tmp_node->next != NULL){
+        printf("%d ",tmp_node->val);
+        tmp_node = tmp_node->next;
+    }
+    printf("%d ",tmp_node->val);
+    printf("\n");
+}
+
+list create_list(void){
+    list l;
+    l = (struct ListRecord *) malloc(sizeof(struct ListRecord));
+    if (l == NULL) {
         printf("Could not allocated !\n");
     }
-    MakeEmptyList(list);
-    return list;
+    make_empty_list(l);
+    return l;
 }
 
-void MakeEmptyList(List list) {
-    list->head = (struct ListNode *) malloc(sizeof(struct ListNode));
-    if (list->head == NULL)
+void make_empty_list(list l) {
+    l->head = (struct node *) malloc(sizeof(struct node));
+    if (l->head == NULL)
         printf("Could not allocated !\n");
 
-    list->head->next = NULL;
-    list->tail = list->head;
-
-    list->size = 0;
+    l->head->next = NULL;
+    l->tail = l->head;
+    l->size = 0;
 }
 
-int ListSize(List list){
-    return(list->size);
+int is_empty_list(list l){
+	return l->size == 0;
 }
 
-node ListHead(List list){
-    // returns a node
-	return(list->head);
+int head_of_list(list l){
+	if (!is_empty_list(l)){
+		return l->head->next->val;        
+    }
+	else{
+		printf("The linked list is empty\n");
+		return -1;
+	}
 }
 
-node ListTail(List list){
-	// returns a node
-    return(list->tail);
+int tail_of_list(list l){
+	if (!is_empty_list(l)){
+		return l->tail->val;
+    }
+	else{
+		printf("The linked list is empty\n");
+		return -1;
+	}
 }
 
-void DisplayList(List list){
-        node t;
-        printf("\nList content is below \n");
-        t = list->head;
-        while(t != NULL){
-            printf("%d", t->val);
-            printf("\n");
-            t = t->next;
-        }
-        free(t);
-        printf("\n");
+list sorted_merge(list l1, list l2){
+
+	sort(l1);
+	sort(l2);
+	DisplayList(l1);
+	DisplayList(l2);
+	
+	node traverser1 = l1->head->next;
+	node traverser2 = l2->head->next;
+	
+	list merged_list = CreateList();
+
+	int size = (l1->size > l2->size) ? l1->size : l2->size;
+	int i;
+
+	for(i=0; i< size; i++){
+			//insert_val(merged_list,i,traverser1->val);
+			//insert_val(merged_list,i,traverser2->val);
+			InsertTail(merged_list,traverser1->val);
+			InsertTail(merged_list,traverser2->val);
+				
+			traverser1 = traverser1->next;
+			traverser2 = traverser2->next;
+		
+	}
+	//sort(merged_list);
+
+	return merged_list;
+}
+
+void remove_duplicate(list l){
+    // this should get called in a while loop to make sure there is no duplicate
+	sort(l);
+	node tmpnode = l->head->next;
+	while(1){
+		if(tmpnode->val == tmpnode->next->val){
+			break;
+		}
+		tmpnode = tmpnode->next;
+	}
+	delete_node(l,tmpnode->val);
+	l->size--;
+}
+
+int get_element_at(list l, int pos){
+	node tmpnode;
+	tmpnode = l->head->next;
+
+	while(pos != NULL){
+		tmpnode = tmpnode->next;
+		pos--;
+	}
+	return tmpnode->val;
 
 }
 
-void InsertHead(List list , int val){
-    node newNode;
-    newNode = (struct ListNode*)malloc(sizeof(struct ListNode));
-    // dummy node
-	newNode->val = val;
-    newNode->next = NULL;
+int get_position(list l, int val){
+	int pos;
+	node tmpnode;
+	tmpnode = l->head->next;
+	while(1){
+		if(tmpnode->val == val){
+			break;
+		}
+		tmpnode = tmpnode->next;
+	}
+	return pos;
+}
+
+void delete_node(list l, int val){
+	node tmpnode = l->head->next;
+	while(1){
+		if(tmpnode->next->val == val){
+			break;
+		}
+		tmpnode = tmpnode->next;
+	}
+
+	//   | tmpnode->next |  val | another node |
+	//  	          |______|
+	//	
+	tmpnode->next = tmpnode->next->next;
+	tmpnode = tmpnode->next;
+	free(tmpnode);
+	l->size--;
+}
+
+void insert_head(list l , int val){
+    node tmpnode = (node)malloc(sizeof(struct node));
+	tmpnode->val = val;
+    tmpnode->next = NULL;
     
-    if(list->size == 0 ){
-            list->head = list->tail = newNode;
-            list->size++;
+    if(l->size == 0 ){
+            l->head = l->tail = tmpnode;
+            l->size++;
     }
     else{
-        newNode->next = list->head;
-        list->head = newNode;
-        list->size++;
+        tmpnode->next = l->head;
+        l->head = tmpnode;
+        l->size++;
     }
 }
-void InsertTail(List list , int val){
-    node current,newNode;
-    // node newNode = (node)malloc(sizeof(struct ListNode));
-    
-    newNode = (struct ListNode*)malloc(sizeof(struct ListNode));
 
-    newNode->val = val;
-    newNode->next = NULL;
+void insert_tail(list l , int val){
+    node traverser,tmpnode;
 
-    current = list->head;
-    if(list->size==0){
-        list->head = list->tail = newNode;
-        list->size++;
+    tmpnode = (node)malloc(sizeof(struct node));
+
+    tmpnode->val = val;
+    tmpnode->next = NULL;
+
+    traverser = l->head;
+    if(l->size==0){
+        l->head = l->tail = tmpnode;
+        l->size++;
     }
     else{
-        while(current->next != NULL){
-            current = current->next;
+        while(traverser->next != NULL){
+            traverser = traverser->next;
         }
-        current->next = newNode;
-        list->tail = newNode;
-        list->size++;
+        traverser->next = tmpnode;
+        l->tail = tmpnode;
+        l->size++;
     }
 }
 
-int IsEmpty(List list){
-    return (list->size == 0);
-}
-
-void sort(List list) {
-    node currNode;
-    currNode = list->head;
-    while (currNode != NULL) {
-        node nextNode;
-        if (currNode == NULL) {
+void sort(list l) {
+    node traverser;
+    traverser = l->head;
+	int condition;
+    while (traverser != NULL) {
+        node traverser_next;
+        if (traverser == NULL) {
             return;
         }
-        nextNode = currNode->next;
-        while (nextNode != NULL) {
+        traverser_next = traverser->next;
+        while (traverser_next != NULL) {
         	
         	// there goes the condition that you want to sort 
-			condition = currNode->val > nextNode->val;
+			condition = traverser->val > traverser_next->val;
             if (condition) {
-                dataSwap(currNode, nextNode);
+                data_swap(traverser, traverser_next);
             }
-            nextNode = nextNode->next;
+            traverser_next = traverser_next->next;
         }
-        currNode = currNode->next;
+        traverser = traverser->next;
+        free(traverser_next);
     }
-    free(currNode);
+    free(traverser);
 }
 
-void dataSwap(struct ListNode *a, struct ListNode *b) {
 
-    //  swapping all the information
+void data_swap(node a, node b) {
     int temp;
     temp = a->val;
     a->val = b->val;
