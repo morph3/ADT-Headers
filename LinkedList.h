@@ -1,34 +1,44 @@
-#ifndef _LINKEDLIST_H
-#define _LINKEDLIST_H
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
 
 #include <stdio.h>
 #include <stdlib.h>
 
+#define DEBUG 1
 
-struct ListNode{
-   	int val;
-    struct ListNode *next;
+struct node{
+    int val;
+    struct node *next;
 };
 
 struct ListRecord{
-    struct ListNode *head;
-    struct ListNode *tail;
-    int size;
+    struct node *head;
+    struct node *tail;
+    int size;   
 };
 
-typedef struct ListNode *node;
-typedef struct ListRecord *List;
+typedef struct node *node;
+typedef struct ListRecord *list;
+
+void insert_val(list l, int, int);
+void insert_head(list l , int val);
+void insert_tail(list l , int val);
+
+void print_list(list l);
+void make_empty_list(list l);
+void remove_duplicate(list l);
+void delete_node(list l, int val);
+void data_swap(node a, node b);
+void sort(list l);
 
 
-List CreateList(void);
-void MakeEmptyList(List list);
-int ListSize(List list);
-node ListHead(List list);
-node ListTail(List list);
-void DisplayList(List list);
-void InsertHead(List list , int val);
-void InsertTail(List list , int val);
-int IsEmpty(List list);
-void sort(List list);
-void dataSwap(struct ListNode *a, struct ListNode *b);
+int is_empty_list(list l);
+int head_of_list(list l);
+int tail_of_list(list l);
+int get_element_at(list l, int pos);
+int get_position(list l, int val);
+
+list sorted_merge(list l1, list l2);
+list create_list(void);
+
 #endif
