@@ -6,30 +6,31 @@
 
 #define DEBUG 1
 
-struct node{
-    int val;
-    struct node *next;
+struct Node {
+	int val;
+	struct Node *next;
 };
 
-struct ListRecord{
-    struct node *head;
-    struct node *tail;
-    int size;   
+struct ListRecord {
+	struct Node *head;
+	struct Node *tail;
+	int size;
 };
 
-typedef struct node *node;
+typedef struct Node *node;
 typedef struct ListRecord *list;
 
 void insert_val(list l, int, int);
-void insert_head(list l , int val);
-void insert_tail(list l , int val);
-
+void insert_head(list l, int val);
+void insert_tail(list l, int val);
+void reverse_list(list l);
 void print_list(list l);
 void make_empty_list(list l);
 void remove_duplicate(list l);
 void delete_node(list l, int val);
 void data_swap(node a, node b);
 void sort(list l);
+void destroy_list(list l);
 
 
 int is_empty_list(list l);
