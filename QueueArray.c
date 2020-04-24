@@ -138,7 +138,7 @@ void enqueue(Queue q, int val) {
 	}
 	else {
 		q->size++;
-		q->rear = (q, q->rear);
+		q->rear = succ(q, q->rear);
 		q->array[q->rear] = val;
 		q->rear++;
 	}
