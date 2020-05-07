@@ -1,130 +1,98 @@
 #include "Queue.h"
 
 /*This function initialises the queue*/
-Queue CreateQueue(){
-    Queue myQ;
-    myQ = (struct QueueRecord*)malloc(sizeof(struct QueueRecord));
-    if(myQ == NULL){
-        printf("Could not allocated !\n");
-    }
-    MakeEmptyQueue(myQ);
-    return myQ;
+queue create_queue() {
+	queue q = (queue)malloc(sizeof(struct QueueRecord));
+	if (q == NULL) {
+		printf("Could not allocated !\n");
+	}
+	make_empty_queue(q);
+	return q;
 }
 
 /*This function sets the queue size to 0, and creates a dummy element
 and sets the front and rear point to this dummy element*/
-void MakeEmptyQueue(Queue q){
-    q->size = 0;
-    struct Node* newNode;
-    newNode = (struct Node*)malloc(sizeof(struct Node));
-    // QueueNode newNode = (QueueNode)malloc(sizeof(struct Node));
-
-    q->front = newNode;
-    if(q->front == NULL){
-        printf("Could not allocated !");
-    }
-    q->front->next = NULL;
-    q->rear = q->front;
-    q->size = 0 ;
+void make_empty_queue(queue q) {
+	node temp = (node)malloc(sizeof(struct Node));
+	temp->next = NULL;
+	q->front = temp;
+	q->rear = q->front;
+	q->size = 0;
 }
 
 /*Shows if the queue is empty*/
-int IsEmptyQueue(Queue q){
-    return((q->size == 0));
-}
+int is_empty_queue(queue q) { return((q->size == 0)); }
 
-/*Returns the queue size*/
-int QueueSize(Queue q){
-    return(q->size);
-}
 
-/*Enqueue - Adds a new element to the queue, simply creates a node and
+/*Enqueue - Adds a new element to the queue, simly creates a node and
 adds it to the rear of the queue*/
-void Enqueue(Queue q , int val){
-    struct Node* newNode;
-    newNode = (struct Node*)malloc(sizeof(struct Node));
-
-    newNode->priority = 0;
-    newNode->val = val;
-    newNode->next = NULL;
-
-    q->rear->next = newNode;
-    q->rear = newNode;
-    q->size++;
+void enqueue(queue q, node customer) {
+	q->rear->next = customer;
+	q->rear = customer;
+	q->size++;
 
 }
-void PriorityEnqueue(Queue q , int val , int priority){
-    struct Node* currNode = (struct Node*)malloc(sizeof(struct Node));
-    struct Node* newNode =  (struct Node*)malloc(sizeof(struct Node));
-
-    // dummy node
-    newNode->val = val;
-	newNode->priority = priority;
-
-    currNode = q->front;
-    int condition =  currNode->priority <= newNode->priority ;
-    if(q->front == NULL || condition){
-        newNode->next = q->front;
-        q->front = newNode;
-        q->size++;
-    }
-    else{
-        while(currNode->next!=NULL && (currNode->next->priority >= newNode->priority) ){
-            currNode = currNode->next;
-        }
-        newNode->next = currNode->next ;
-        currNode->next = newNode;
-        q->size++;
-    }
+void priority_enqueue( queue q, node customer ) {
+	
+	node traverser =  q->front;
+	int condition = traverser->priority <= customer->priority;
+	if (q->front == NULL || condition) {
+		customer->next = q->front;
+		q->front = customer;
+		q->size++;
+	}
+	else {
+		while (traverser->next != NULL && (traverser->next->priority >= customer->priority)) {
+			traverser = traverser->next;
+		}
+		customer->next = traverser->next;
+		traverser->next = customer;
+		q->size++;
+	}
 }
 
 /*Dequeue - Removes a node from the queue, basically removes a node from
 the front of the queue*/
-QueueNode Dequeue(Queue q){
-    struct Node*  temp;
-    temp = q->front->next;
-    q->front= q->front->next;
-    return (temp);
+node dequeue(queue q) {
+	if (q->size == 0) {
+		// can't dequeue from an empty queue
+		return NULL;
+	}
+	
+	node temp = q->front->next;
+	q->front = q->front->next;
+	q->size--;
+	
+	return (temp);
 }
 
-/*Returns the value stored in the front of the queue*/
-QueueNode FrontOfQueue(Queue q) {
-    if (!IsEmptyQueue(q))
-        return (q->front->next);
-    else
-    {
-        printf("The queue is empty\n");
-        return NULL;
-    }
-}
+/*Returns the front node of the queue*/
+node front_of_queue(queue q) { return q->front->next ? !(is_empty_queue(q)) : -1; }
 
-/*Returns the value stored in the rear of the queue*/
-QueueNode RearOfQueue(Queue q) {
-    if (!IsEmptyQueue(q))
-        return (q->rear);
-    else {
-        printf("The queue is empty\n");
-        return NULL;
-    }
-}
+/*Returns the rear node of the queue*/
+node rear_of_queue(queue q) { return q->rear ? !(is_empty_queue(q)) : -1; }
 
 /*Displays the content of the queue*/
-void DisplayQueue(Queue q){
-    struct Node *t;
-    if(!IsEmptyQueue(q)){
-        t = q->front->next;
-        printf("\nQueue content is below\n");
-        printf("Val , Priority\n");
-        while (t != NULL){
-            printf("%d ",t->val);
-            printf("%d ", t->priority);
-            t = t->next;
-            printf("\n");
-        }
-        free(t);
-        printf("\n");
-    }
-    else{
-        printf("Queue is empty \n");
-    }
+void display_queue(queue q) {
+	node traverser;
+	if (!is_empty_queue(q)) {
+		node traverser = q->front->next;
+		printf("\Queue content is below \n");
+		printf("Customer Type - Customer Age - ArrivalTime - ServiceTime - Service Start Time - Payment Type - Cashier ID\n");
+		while (traverser != NULL) {
+			printf("        %c     ", traverser->customerType);
+			printf("      %d     ", traverser->customerAge);
+			printf("      %d     ", traverser->arrivalTime);
+			printf("      %d     ", traverser->serviceTime);
+			printf("               %d     ", traverser->serviceStartTime);
+			(traverser->paymentType == CASH) ? printf("        Cash     ") : printf("        Credit Card     ");
+			printf("     %d     ", traverser->cashierId);
+			printf("\n");
+			traverser = traverser->next;
+	
+		}
+	}
+	else {
+		printf("Queue is empty \n");
+	}
 }
